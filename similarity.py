@@ -8,6 +8,7 @@ import random
 import matplotlib.pyplot as plt
 
 
+
 ## TO DO: HOW WILL YOU MAKE IT UNIVERSAL ##
 PORT_NUMBER = 8080
 SPOTIPY_CLIENT_ID = '5bc2844a6a2849f6a67af0d0e76eda1a'
@@ -30,7 +31,6 @@ f = open("filtered_artists.txt")
 for line in f:
     artists.append(line.rstrip())
 
-# the dataset we're using uses names of artists as keys, and we need IDs
 def get_id_from_name(name):
     result = spotify.search(q='artist:' + name, type='artist')
     if(result['artists']['items'] == []):
@@ -96,7 +96,7 @@ def sample(artist_list, n):
     return sample_id
 
 # returns a list of 5 related artists and n unrelated artists
-def contest_design(artist_list, target_artist, n):
+def create_testset(artist_list, target_artist, n):
     random_artists = sample(artist_list, n)
     related_artists_5 = five_related(target_artist)
     random_artists.extend(related_artists_5)
@@ -107,7 +107,7 @@ def contest_design(artist_list, target_artist, n):
 # all of the other artists in the sample
 def genre_similarity_scores(target_artist, artist_list, n):
     target_genres = get_genre(target_artist)
-    other_artists = contest_design(artist_list, target_artist, n)
+    other_artists = create_testset(artist_list, target_artist, n)
 
     similarity_score = {}
     for artist in other_artists:
@@ -121,34 +121,26 @@ def genre_similarity_scores(target_artist, artist_list, n):
 
     return similarity_score
 
+
 # takes the similarity score dictionary returned by genre similarity scores
 # and returns the top 5 highest scoring artists
+# Our prediction of top 5 related artists
 def get_top_five_similar_artists(similarity_score):
     sorted_similar = sorted(similarity_score.items(), key=lambda x: x[1], reverse=True)
-    sorted_similar = sorted_similar[:5]
-    top_5 = []
-    for k,v in sorted_similar:
-        top_5.append(k)
-
+    top_5 = [x[0] for x in sorted_similar[:5]]
     return top_5
 
 # compares the prediction top 5 with the actual top 5 and returns a score
 def scoring_comp(target_artist, artist_list, similarity_score):
     top_five = get_top_five_similar_artists(similarity_score)
     real_top_five = five_related(target_artist)
-
-    score = 0
-
-    for a in top_five:
-        if(a in real_top_five):
-            score += 1
-
+    score = len(set(real_top_five).intersection(top_five))
     return score
 
 # takes in a target artist, list of all artists and a similarity score dictionary
-# constructs a graph wherein the target node is black, the spotify related artists are red
-# and the remainder are blue. returns a graph with edges between target node and nodes
-# we predict are related
+# constructs a graph where target node is black, the spotify related artists are red
+# and the remainder are blue. 
+# returns a graph with edges between target node and nodes we predict are related
 def visualize_similarity_guessed(target, artists, similarity_score):
     graph = nx.Graph()
     color_map = []
@@ -163,14 +155,43 @@ def visualize_similarity_guessed(target, artists, similarity_score):
             graph.add_edge(target, k, weight=v, length = 10)
 
     for node in graph.nodes():
-        if(node in related):
+        if node in related:
             color_map.append('red')
-        elif(node == target):
+        elif node == target:
             color_map.append('black')
         else:
             color_map.append('blue')
 
     nx.draw(graph, node_color=color_map, node_size = 1)
+    plt.show()
+
+
+# just for tinkering around - not plotting all artists
+def visualize_similarity_guessed_(target, artists, similarity_score):
+    graph = nx.Graph()
+    color_map = []
+
+    related = five_related(target)
+    print("len rel: ", len(related))
+    print("len sim: ", len(similarity_score))
+
+    graph.add_node(target)
+    graph.add_nodes_from(related)
+
+    for artist,score in similarity_score.items():
+        if(score > 0):
+            graph.add_edge(target, artist, weight=score, length = 10)
+
+    for node in graph.nodes():
+        if node in related:
+            color_map.append('green')
+        elif node == target:
+            color_map.append('black')
+        else:
+            color_map.append('red')
+
+    nx.draw(graph, node_color=color_map, node_size = 35)
+    plt.show()
 
 
 #scores how our function performs with various sample sizes and plots it
@@ -179,6 +200,11 @@ def visualize_similarity_guessed(target, artists, similarity_score):
 # for i in sample_size:
 #     similarity_score = genre_similarity_scores(mosdef_uri, artists, i-5)
 #     scores_ye.append(scoring_comp(mosdef_uri, artists, similarity_score))
+
+
+similarity_score = genre_similarity_scores(mosdef_uri, artists, 50-5)
+
+visualize_similarity_guessed_(mosdef_uri, artists, similarity_score)
 
 #plt.plot(sample_size, scores_ye)
 #plt.title('Mos Def - Similarity scoring')
