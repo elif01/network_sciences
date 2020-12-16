@@ -1,1 +1,23 @@
-Hello!
+~~This is our Network Science Homework~~
+
+Spotipy authentication instructions 
+-----------------------------------
+
+Install spotipy: 
+  pip install spotipy
+
+To be able to use the spotipy library, you will need:
+  A spotify account
+  A spotify developer account
+
+Once logged in to your spotify developer account, 
+obtain the following authentication tokens:
+  spotifyclientid 
+  spotifyclientsecret
+
+Add the following lines to your bash profile:
+  export SPOTIFY_CLIENT_ID=yourspotifyclientid
+  export SPOTIFY_CLIENT_SECRET=yourspotifyclientsecret
+
+
+
