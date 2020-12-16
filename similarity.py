@@ -221,10 +221,6 @@ clora_bryant
 
 
 
-
-
-
-
 # Given <ARTIST> with sample size <n>
 # Return my score out of 5
 def test_me_genre(target_artist, sample_list):
@@ -232,8 +228,6 @@ def test_me_genre(target_artist, sample_list):
     my_score = scoring_comp(target_artist, sim_score)
     return my_score
 
-# Given <ARTIST> with sample size <n>
-# Return my score out of 5
 def test_me_pop(target_artist, sample_list):
     sim_score = pop_sim_scores(target_artist, sample_list)
     my_score = scoring_comp(target_artist, sim_score)
@@ -285,6 +279,8 @@ def run_experiment_all_3(artists, artist, iterations, sample_size):
 
 
 
+# ############### TESTING PERFORMANCE ################## #
+# Run all 3 experiments, see results. Full_list is the overall list of artists to sample from.
 def one_experiment(testset, full_list, iters, sample_size):
     score1 = 0
     score2 = 0
@@ -314,64 +310,4 @@ one_experiment(test_artists[7:], artists, 1, 50)
 
 
 
-
-
-# #scores how our function performs with various sample sizes and plots it
-# sample_size = [50, 250, 500]
-# scores_one = []
-# scores_two = []
-# scores_three = []
-
-# for i in range(10): # Number of iterations
-#     print("initiating round " + str(i))
-#     iteration_one = []
-#     iteration_two = []
-#     iteration_three = []
-#     for j in sample_size:
-#         other_artists, similarity_score_one = genre_similarity_scores(mosdef_uri, artists, j-5)
-#         iteration_one.append(scoring_comp(mosdef_uri,  similarity_score_one))
-#         other_artists, similarity_score_two = pop_sim_scores(mosdef_uri, other_artists, similarity_score_one)
-#         iteration_two.append(scoring_comp(mosdef_uri,  similarity_score_two))
-#         other_artists, similarity_score_three = dance_sim_score(mosdef_uri, other_artists, similarity_score_two)
-#         iteration_three.append(scoring_comp(mosdef_uri,  similarity_score_three))
-#     scores_one.append(iteration_one)
-#     scores_two.append(iteration_two)
-#     scores_three.append(iteration_three)
-
-
-# results_one = [0]*len(sample_size) #Populate a list of zeros the size of number of
-# results_two = [0]*len(sample_size) #sample sizes tested 
-# results_three = [0]*len(sample_size)
-
-# for i in range(len(scores_one)):
-#     for j in range(len(scores_one[i])):
-#         results_one[j] += scores_one[i][j]
-#         results_two[j] += scores_two[i][j]
-#         results_three[j] += scores_three[i][j]
-
-
-# average_results_one = np.divide(results_one, len(scores_one))
-# average_results_two = np.divide(results_two, len(scores_two))
-# average_results_three = np.divide(results_three, len(scores_three))
-
-# plt.plot(sample_size, average_results_one.tolist())
-# plt.ylim(0,5)
-# plt.title('Mos Def - Similarity scoring (genre only)')
-# plt.xlabel('Sample size')
-# plt.ylabel('Average of Correctly guessed similar artists')
-# plt.show()
-
-# plt.plot(sample_size, average_results_one.tolist())
-# plt.ylim(0,5)
-# plt.title('Mos Def - Similarity scoring (genre and popularity)')
-# plt.xlabel('Sample size')
-# plt.ylabel('Average of Correctly guessed similar artists') 
-# plt.show()
-
-# plt.plot(sample_size, average_results_one.tolist())
-# plt.ylim(0,5)
-# plt.title('Mos Def - Similarity scoring (genre, popularity, and danceability)')
-# plt.xlabel('Sample size')
-# plt.ylabel('Average of Correctly guessed similar artists')
-# plt.show()
 
