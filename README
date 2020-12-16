@@ -1,5 +1,9 @@
 ~~This is our Network Science Homework~~
 
+Many thanks to the authors of Python's Spotipy library
+and Yamac Eren Ay who assembled the Spotify song dataset
+we used and shared it on Kaggle.
+
 Spotipy authentication instructions 
 -----------------------------------
 
