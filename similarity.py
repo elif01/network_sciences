@@ -1,12 +1,11 @@
 
-import networkx as nx
+#import networkx as nx
 import spotipy
-#import json
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import random
-import matplotlib.pyplot as plt
-import numpy as np
+#import matplotlib.pyplot as plt
+#import numpy as np
 
 
 ## TO DO: HOW WILL YOU MAKE IT UNIVERSAL ##
@@ -295,9 +294,11 @@ def one_experiment(testset, full_list, iters, sample_size):
 
 
     for a in testset:
-        print("testing artist: ", name(a), '\n')
+        print("\nstarted experimenting genre\n")
         score1 += run_experiment_genre_only(full_list, a, iters, sample_size)
+        print("\nstarted experimenting genre and popularity\n")
         score2 += run_experiment_genre_and_pop(full_list, a, iters, sample_size)
+        print("\nstarted experimenting with all variables\n")
         score3 += run_experiment_all_3(full_list, a, iters, sample_size)
 
     print("---Average scores for {0} artists, over {1} iterations with a sample size of {2}----\n".format(len(testset), iters, sample_size))
@@ -309,7 +310,7 @@ def one_experiment(testset, full_list, iters, sample_size):
 
 
 
-one_experiment(test_artists, artists, 10, 50)
+one_experiment(test_artists[7:], artists, 1, 50)
 
 
 
