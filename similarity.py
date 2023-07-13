@@ -1,19 +1,11 @@
-
-#import networkx as nx
-import spotipy
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import random
-#import matplotlib.pyplot as plt
-#import numpy as np
 
-
-## TO DO: HOW WILL YOU MAKE IT UNIVERSAL ##
 PORT_NUMBER = 8080
 SPOTIPY_CLIENT_ID = '5bc2844a6a2849f6a67af0d0e76eda1a'
 SPOTIPY_CLIENT_SECRET = '1fe80ea9b0ce464aab9afbb51fbc7800'
 SPOTIPY_REDIRECT_URI = 'http://localhost:8080'
-
 
 mosdef_uri = "spotify:artist:0Mz5XE0kb1GBnbLQm2VbcO"
 taylor_swift_uri = "spotify:artist:06HL4z0CvFAxyc27GXpf02"
@@ -43,13 +35,13 @@ def get_id_from_name(name):
     url = items["uri"]
     return(url) 
 
-#takes in ID and returns list of genres for that artist
+# takes in ID and returns list of genres for that artist
 def get_genre(artist_id):
     artist_object = spotify.artist(artist_id)
     genres = artist_object["genres"]
     return(genres) 
 
-#takes in ID and returns full list of related artist
+# takes in ID and returns full list of related artist
 def get_related_artists(artist_id):
     artists = spotify.artist_related_artists(artist_id)['artists']
     ans = [x['uri'] for x in artists]
@@ -59,10 +51,8 @@ def get_popularity(artist_id):
     artist_object = spotify.artist(artist_id)
     popularity = artist_object["popularity"]
     return(popularity) # a score out of 100
-
-
-
-# Avg danceability score of an artist's top 10 tracks
+    
+# average danceability score of an artist's top 10 tracks
 def avg_dance(artist_id):
     results = spotify.artist_top_tracks(artist_id)
     # ids of top 10 tracks
@@ -80,18 +70,17 @@ def avg_dance(artist_id):
         except ZeroDivisionError:
             return 10000
 
-
-#takes in two artist IDs and returns true if related and false if not
+# takes in two artist IDs and returns true if related and false if not
 def are_related(random_artist_id, target_artist_id):
     random_related = get_related_artists(random_artist_id)
     target_related = get_related_artists(target_artist_id)
     return (random_artist_id in target_related or target_artist_id in random_related)
 
-#takes artist ID and returns list of five related artists
+# takes artist ID and returns list of five related artists
 def five_related(artist_id):
     return get_related_artists(artist_id)[:5]
 
-#gets the whole artist list and sample size n, and returns a sample of n artists
+# gets the whole artist list and sample size n, and returns a sample of n artists
 def sample(artist_list, n):
     sample = random.sample(artist_list, n)
     sample_id = []
@@ -99,16 +88,16 @@ def sample(artist_list, n):
         sample_id.append(s)
     return sample_id
 
-#returns a list of 5 related artists and n unrelated artists
+# returns a list of 5 related artists and n unrelated artists
 def contest_design(artist_list, target_artist, n):
     random_artists = sample(artist_list, n)
     related_artists_5 = five_related(target_artist)
     random_artists.extend(related_artists_5)
     return random_artists
 
-#takes in target artist, the list of all artists, and a sample size n
-#returns a similarity score as a dictionary, between the artist and 
-#all of the other artists in the sample
+# takes in target artist, the list of all artists, and a sample size n
+# returns a similarity score as a dictionary, between the artist and 
+# all of the other artists in the sample
 def genre_similarity_scores(target_artist, artist_list):
     target_genres = get_genre(target_artist)
 
@@ -135,8 +124,6 @@ def pop_sim_scores(target_artist, other_artists):
     
     return similarity_score
 
-
-
 # How similar are Artist1 and Artist2 in terms of danceability
 def dance_sim_scores(target_artist, other_artists):
     target_dance = avg_dance(target_artist)
@@ -150,10 +137,8 @@ def dance_sim_scores(target_artist, other_artists):
     return similarity_score
 
 
-
-
-#takes the similarity score dictionary returned by genre similarity scores
-#and returns the top 5 highest scoring artists
+# takes the similarity score dictionary returned by genre similarity scores
+# and returns the top 5 highest scoring artists
 def get_top_five_similar_artists(similarity_score):
     sorted_similar = sorted(similarity_score.items(), key=lambda x: x[1], reverse=True)
     sorted_similar = sorted_similar[:5]
@@ -176,35 +161,6 @@ def scoring_comp(target_artist, similarity_score):
 
     return score
 
-#takes in a target artist, list of all artists and a similarity score dictionary
-#constructs a graph wherein the target node is black, the spotify related artists are red
-#and the remainder are blue. returns a graph with edges between target node and nodes
-#we predict are related
-def visualize_similarity_guessed(target, artists, similarity_score):
-    graph = nx.Graph()
-    color_map = []
-
-    related = five_related(target)
-
-    graph.add_node(target)
-    graph.add_nodes_from(artists)
-
-    for k,v in similarity_score.items():
-        if(v > 0):
-            graph.add_edge(target, k, weight=v, length = 10)
-
-    for node in graph.nodes():
-        if(node in related):
-            color_map.append('red')
-        elif(node == target):
-            color_map.append('black')
-        else:
-            color_map.append('blue')
-
-    nx.draw(graph, node_color=color_map, node_size = 1)
-    plt.show()
-
-
 
 test_artists = [
 mosdef_uri,
@@ -219,10 +175,7 @@ kidcudi_uri,
 clora_bryant 
 ]
 
-
-
-# Given <ARTIST> with sample size <n>
-# Return my score out of 5
+# given <ARTIST> with sample size <n> return score out of 5
 def test_me_genre(target_artist, sample_list):
     sim_score = genre_similarity_scores(target_artist, sample_list)
     my_score = scoring_comp(target_artist, sim_score)
@@ -238,11 +191,8 @@ def test_me_dance(target_artist, sample_list):
     my_score = scoring_comp(target_artist, sim_score)
     return my_score
 
-
-
 # average my scores over <iter> iterations 
 # where a single iteration has sample size n
-
 def run_experiment_genre_only(artists, artist, iterations, sample_size):
     my_sample = contest_design(artists, artist, sample_size)
 
@@ -276,7 +226,6 @@ def run_experiment_all_3(artists, artist, iterations, sample_size):
              test_me_dance(artist, my_sample)) / 3)
     avg = sum(my_scores) / len(my_scores)
     return avg
-
 
 
 # ############### TESTING PERFORMANCE ################## #
